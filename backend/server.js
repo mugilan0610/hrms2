@@ -31,8 +31,18 @@ app.use("/api/organisations", organisationRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/teams", teamRoutes);
 
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  const status = err.status || 500;
+  res.status(status).json({
+    message: err.message || 'Internal Server Error',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  });
+});
+
 // Sync models & start server
-sequelize.sync({ alter: true }) // Creates/updates tables based on models
+sequelize.sync({ force: false }) // Creates/updates tables based on models
   .then(() => {
     console.log("All tables synced successfully!");
     const PORT = process.env.PORT || 5000;

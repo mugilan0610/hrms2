@@ -10,7 +10,7 @@ const RegisterOrganisation = () => {
   const handleRegister = async () => {
     try {
       await axios.post(
-        "http://localhost:5000/api/organisations",
+        `${process.env.REACT_APP_API_URL}/organisations`,
         { name },
         { headers: { Authorization: `Bearer ${token}` } }
       );

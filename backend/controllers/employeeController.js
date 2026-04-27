@@ -24,8 +24,12 @@ exports.getEmployeeById = async (req, res) => {
 // CREATE employee
 exports.createEmployee = async (req, res) => {
   try {
-    const { firstName, lastName, email, organisationId } = req.body;
-    const employee = await Employee.create({ firstName, lastName, email, organisationId });
+    const { firstName, lastName, email, organisationId, teamId, role, active } = req.body;
+    const employee = await Employee.create({ 
+      firstName, lastName, email, organisationId, teamId, 
+      role: role || 'Employee', 
+      active: active !== undefined ? active : true 
+    });
     res.json({ message: "Employee created successfully", employee });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -35,12 +39,30 @@ exports.createEmployee = async (req, res) => {
 // UPDATE employee
 exports.updateEmployee = async (req, res) => {
   try {
-    const { firstName, lastName, email } = req.body;
+    const { firstName, lastName, email, teamId, role, active } = req.body;
     const employee = await Employee.findByPk(req.params.id);
     if (!employee) return res.status(404).json({ error: "Employee not found" });
 
-    await employee.update({ firstName, lastName, email });
+    await employee.update({ 
+      firstName, lastName, email, teamId, role, 
+      active: active !== undefined ? active : employee.active 
+    });
     res.json({ message: "Employee updated", employee });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// PATCH employee status
+exports.updateEmployeeStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const employee = await Employee.findByPk(req.params.id);
+    if (!employee) return res.status(404).json({ error: "Employee not found" });
+
+    const isActive = status === 'Active';
+    await employee.update({ active: isActive });
+    res.json({ message: "Employee status updated", employee });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

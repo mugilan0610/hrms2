@@ -8,7 +8,7 @@ const Teams = () => {
 
   const fetchTeams = () => {
     axios
-      .get("http://localhost:5000/api/teams", {
+      .get(`${process.env.REACT_APP_API_URL}/teams`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => setTeams(res.data))
@@ -22,7 +22,7 @@ const Teams = () => {
   const deleteTeam = async (id) => {
     if (!window.confirm("Delete this team?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/teams/${id}`, {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/teams/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchTeams();

@@ -1,4 +1,4 @@
-﻿const { DataTypes } = require("sequelize");
+const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
 const Employee = require("./Employee"); // Import Employee model for association
 
@@ -19,6 +19,14 @@ const Team = sequelize.define(
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
     },
+    department: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    manager: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    }
   },
   {
     tableName: "teams",

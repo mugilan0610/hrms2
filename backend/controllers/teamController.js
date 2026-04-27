@@ -97,7 +97,42 @@ exports.unassignEmployees = async (req, res) => {
 exports.getTeams = async (req, res) => {
   try {
     const teams = await Team.findAll();
-    res.json(teams);
+    // For SQLite member counts, fetch employees and map them
+    // Alternatively just use an include
+    const teamsWithCount = await Promise.all(teams.map(async (team) => {
+      const count = await Employee.count({ where: { teamId: team.id } });
+      return { ...team.toJSON(), memberCount: count };
+    }));
+    res.json(teamsWithCount);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Update a team
+exports.updateTeam = async (req, res) => {
+  try {
+    const { name, department, manager } = req.body;
+    const team = await Team.findByPk(req.params.id);
+    if (!team) return res.status(404).json({ error: "Team not found" });
+
+    await team.update({ name, department, manager });
+    res.json({ message: "Team updated", team });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// Delete a team
+exports.deleteTeam = async (req, res) => {
+  try {
+    const team = await Team.findByPk(req.params.id);
+    if (!team) {
+      return res.status(404).json({ message: "Team not found" });
+    }
+    
+    await team.destroy();
+    res.status(200).json({ message: "Team deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
